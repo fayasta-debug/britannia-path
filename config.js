@@ -9,7 +9,7 @@
 */
 window.BRITANNIA_CONFIG = {
   supabase: {
-    url: "YOUR_SUPABASE_URL",
-    publishableKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
+    url: "https://napkiesmmdgzarppouaf.supabase.co",
+    publishableKey: "sb_publishable_64_6lsNuR3fAJ6bKyoqgjQ_Ga-IRhnh"
   }
 };
