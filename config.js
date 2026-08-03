@@ -1,12 +1,4 @@
-/*
-  CONFIGURACIÓN PÚBLICA PARA GITHUB PAGES
-  1. Crea un proyecto en Supabase.
-  2. Copia Project URL y la publishable/anon key.
-  3. Reemplaza los valores siguientes.
-
-  Es normal que esta clave aparezca en el navegador: debe ser la clave pública
-  (publishable o anon), NUNCA una secret key ni service_role.
-*/
+/* Configuración pública de Britannia Path. La publishable key es apta para navegador. */
 window.BRITANNIA_CONFIG = {
   supabase: {
     url: "https://napkiesmmdgzarppouaf.supabase.co",

@@ -1,20 +1,9 @@
 # Seguridad
 
-## Claves permitidas en el repositorio
-
-Solo puede incluirse la clave pública de Supabase (`publishable` o `anon`).
-
-Nunca publiques:
-
-- `service_role`
-- `secret key`
-- contraseñas de base de datos
-- tokens personales de GitHub
-
-## Datos de progreso
-
-La tabla `user_progress` usa Row Level Security. Las políticas exigen que el usuario autenticado sea propietario de la fila.
-
-## Reportar un problema
-
-No incluyas correos, tokens, contraseñas ni datos personales al abrir un issue público.
+- `config.js` solo contiene la URL y la **publishable key**.
+- Nunca publiques `sb_secret_`, `service_role`, la contraseña de la base de datos o un token personal.
+- Las respuestas de examen están en `exam_questions`, sin acceso para `anon` ni `authenticated`.
+- La corrección se realiza en la Edge Function `cycle-exam`.
+- La creación de usuarios se realiza en `admin-students`, donde la credencial secreta permanece en el servidor.
+- Las políticas RLS separan los datos de cada estudiante.
+- El rol `admin` se comprueba tanto en la interfaz como en la base de datos o función servidor.
