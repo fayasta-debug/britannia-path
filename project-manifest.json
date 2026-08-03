@@ -2,5 +2,16 @@
   "cycles": 37,
   "questions": 444,
   "questions_per_cycle": 12,
-  "source": "index-corregido-final.html"
+  "source": "index-corregido-final.html",
+  "name": "Britannia Path Admin V5",
+  "version": "5.0.0",
+  "features_added": [
+    "per-user local storage",
+    "activity response persistence",
+    "admin response review",
+    "assignment grading",
+    "exam answer detail",
+    "progress reset"
+  ],
+  "migration_sql": "supabase/03-private-responses-and-admin-review.sql"
 }

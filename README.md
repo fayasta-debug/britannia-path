@@ -1,35 +1,30 @@
-# Britannia Path Admin V4
+# Britannia Path Admin V5
 
-Sitio completo para GitHub Pages + Supabase con dos roles:
+Plataforma de British English Pre-A1–C2 con Legal English, cuentas de estudiante, administrador, progreso, evaluaciones y revisión individual.
 
-- **student**: se asigna automáticamente a toda cuenta registrada.
-- **admin**: puede crear estudiantes, ver su progreso y desbloquear ciclos.
+## Correcciones de V5
 
-La ruta contiene 37 ciclos y el banco servidor contiene 444 preguntas finales (12 por ciclo).
+- Almacenamiento local privado por usuario.
+- Eliminación de la mezcla de respuestas entre cuentas que usan el mismo navegador.
+- Nueva tabla `activity_responses` con Row Level Security.
+- Vista administrativa de respuestas de prácticas.
+- Vista administrativa de producciones escritas.
+- Vista pregunta por pregunta de cada examen final.
+- Calificación y retroalimentación de entregas.
+- Restablecimiento seguro del progreso contaminado sin eliminar la cuenta.
 
-## Regla de progresión
+## Actualización desde V4
 
-1. El estudiante solo abre ciclos desbloqueados.
-2. Debe completar al menos **21 de 24 lecciones** del ciclo (85%).
-3. Rinde el examen final de 12 preguntas.
-4. Aprueba con **70%**.
-5. Supabase marca el ciclo como `completed` y desbloquea automáticamente el siguiente.
-6. Si no aprueba, el ciclo queda `needs_review` y el siguiente continúa bloqueado.
-7. El administrador puede desbloquear manualmente un ciclo.
+Lee primero:
 
-## Instalación muy simple
+`ACTUALIZACION-V5-PASO-A-PASO.md`
 
-Lee primero **PASO-A-PASO-SUPABASE.md**. No necesitas instalar programas ni usar terminal.
+La actualización mínima requiere:
 
-## Archivos principales
+1. Reemplazar los archivos de GitHub.
+2. Ejecutar `supabase/03-private-responses-and-admin-review.sql`.
+3. Volver a desplegar `admin-students` con el nuevo `index.ts`.
 
-- `index.html`: plataforma completa.
-- `config.js`: Project URL y publishable key públicas.
-- `supabase/01-database-and-exams.sql`: tablas, roles, seguridad y preguntas.
-- `supabase/02-make-first-admin.sql`: convierte tu cuenta en administradora.
-- `supabase/functions/admin-students/index.ts`: crea estudiantes y restablece contraseñas.
-- `supabase/functions/cycle-exam/index.ts`: entrega, corrige y registra exámenes.
+## Instalación nueva
 
-## Seguridad
-
-Nunca subas a GitHub una clave `sb_secret_`, `service_role`, contraseña de base de datos ni token personal. Las Edge Functions utilizan las credenciales secretas internas que Supabase proporciona en el servidor.
+Para una instalación desde cero puedes ejecutar `supabase/01-database-and-exams.sql`, que ya incluye la tabla y las políticas de V5.

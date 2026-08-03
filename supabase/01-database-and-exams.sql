@@ -124,6 +124,23 @@ create table if not exists public.assignment_submissions (
   unique (student_id, cycle_id, assignment_type)
 );
 
+create table if not exists public.activity_responses (
+  student_id uuid not null references public.profiles(id) on delete cascade,
+  response_key text not null,
+  cycle_id text not null default 'general',
+  unit_no integer,
+  lesson_no integer,
+  prompt text not null default '',
+  selected_answer text not null default '',
+  correct_answer text not null default '',
+  is_correct boolean not null default false,
+  answered_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (student_id, response_key),
+  check (unit_no is null or unit_no between 1 and 4),
+  check (lesson_no is null or lesson_no between 1 and 6)
+);
+
 create table if not exists public.exam_questions (
   id uuid primary key default gen_random_uuid(),
   cycle_id text not null references public.course_cycles(id) on delete cascade,
@@ -165,6 +182,7 @@ create index if not exists lesson_progress_student_cycle_idx on public.lesson_pr
 create index if not exists cycle_progress_student_idx on public.cycle_progress(student_id);
 create index if not exists exam_attempts_student_cycle_idx on public.exam_attempts(student_id, cycle_id);
 create index if not exists assignments_student_cycle_idx on public.assignment_submissions(student_id, cycle_id);
+create index if not exists activity_responses_student_cycle_idx on public.activity_responses(student_id, cycle_id, answered_at desc);
 
 create or replace function public.touch_updated_at()
 returns trigger language plpgsql as $$
@@ -178,6 +196,9 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 do $$ begin
   create trigger cycle_progress_touch before update on public.cycle_progress for each row execute function public.touch_updated_at();
+exception when duplicate_object then null; end $$;
+do $$ begin
+  create trigger activity_responses_touch before update on public.activity_responses for each row execute function public.touch_updated_at();
 exception when duplicate_object then null; end $$;
 
 create or replace function public.is_admin(check_user uuid default auth.uid())
@@ -251,6 +272,7 @@ alter table public.lesson_progress enable row level security;
 alter table public.cycle_access enable row level security;
 alter table public.cycle_progress enable row level security;
 alter table public.assignment_submissions enable row level security;
+alter table public.activity_responses enable row level security;
 alter table public.exam_questions enable row level security;
 alter table public.exam_sessions enable row level security;
 alter table public.exam_attempts enable row level security;
@@ -279,6 +301,10 @@ create policy bp_cycle_progress_admin_update on public.cycle_progress for update
 create policy bp_assignments_read on public.assignment_submissions for select to authenticated using (student_id=auth.uid() or public.is_admin());
 create policy bp_assignments_insert on public.assignment_submissions for insert to authenticated with check (student_id=auth.uid() or public.is_admin());
 create policy bp_assignments_student_update on public.assignment_submissions for update to authenticated using (student_id=auth.uid() or public.is_admin()) with check (student_id=auth.uid() or public.is_admin());
+create policy bp_activity_responses_read on public.activity_responses for select to authenticated using (student_id=(select auth.uid()) or public.is_admin());
+create policy bp_activity_responses_insert on public.activity_responses for insert to authenticated with check (student_id=(select auth.uid()));
+create policy bp_activity_responses_update on public.activity_responses for update to authenticated using (student_id=(select auth.uid())) with check (student_id=(select auth.uid()));
+create policy bp_activity_responses_delete on public.activity_responses for delete to authenticated using (student_id=(select auth.uid()));
 create policy bp_sessions_read on public.exam_sessions for select to authenticated using (student_id=auth.uid() or public.is_admin());
 create policy bp_attempts_read on public.exam_attempts for select to authenticated using (student_id=auth.uid() or public.is_admin());
 
@@ -293,8 +319,12 @@ revoke update on public.profiles from authenticated;
 grant update(full_name) on public.profiles to authenticated;
 
 grant select on public.course_cycles to anon, authenticated;
-grant select on public.profiles, public.user_progress, public.lesson_progress, public.cycle_access, public.cycle_progress, public.assignment_submissions, public.exam_sessions, public.exam_attempts to authenticated;
-grant insert,update on public.user_progress, public.lesson_progress, public.assignment_submissions to authenticated;
+grant select on public.profiles, public.user_progress, public.lesson_progress, public.cycle_access, public.cycle_progress, public.assignment_submissions, public.activity_responses, public.exam_sessions, public.exam_attempts to authenticated;
+grant insert,update on public.user_progress, public.lesson_progress to authenticated;
+revoke insert,update on public.assignment_submissions from authenticated;
+grant insert(student_id,cycle_id,assignment_type,content,status,submitted_at) on public.assignment_submissions to authenticated;
+grant update(content,status,submitted_at) on public.assignment_submissions to authenticated;
+grant insert,update,delete on public.activity_responses to authenticated;
 grant insert,update,delete on public.cycle_access to authenticated;
 grant update on public.cycle_progress to authenticated;
 
